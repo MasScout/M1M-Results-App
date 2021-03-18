@@ -85,8 +85,24 @@ public class ResultsAnalyzer {
         }
 
         // add wins and losses
-        player1Obj.wins ++;
-        player2Obj.losses ++;
+        for (int i = 0; i < player1Times.length; i++) {
+            if (player1Times[i] == 0) {
+                player1Obj.losses++;
+                player2Obj.wins++;
+            }
+            else if (player2Times[i] == 0) {
+                player1Obj.wins++;
+                player2Obj.losses++;
+            }
+            else if (player1Times[i] < player2Times[i]) {
+                player1Obj.wins++;
+                player2Obj.losses++;
+            }
+            else {
+                player1Obj.losses++;
+                player2Obj.wins++;
+            }
+        }
 
         // Add player times to object
         player1Obj.addTime(level1Name, player1Times[0]);
@@ -144,8 +160,27 @@ public class ResultsAnalyzer {
         }
 
         // add wins and losses
-        player1Obj.wins ++;
-        player2Obj.losses ++;
+        for (int i = 0; i < player1Times.length; i++) {
+            if (player1Times[i] == 0 && player2Times[i] == 0) {
+                // This match wasn't actually played
+            }
+            else if (player1Times[i] == 0) {
+                player1Obj.losses++;
+                player2Obj.wins++;
+            }
+            else if (player2Times[i] == 0) {
+                player1Obj.wins++;
+                player2Obj.losses++;
+            }
+            else if (player1Times[i] < player2Times[i]) {
+                player1Obj.wins++;
+                player2Obj.losses++;
+            }
+            else {
+                player1Obj.losses++;
+                player2Obj.wins++;
+            }
+        }
 
         // Add player times to object
         player1Obj.addTime(level1Name, player1Times[0]);

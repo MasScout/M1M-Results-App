@@ -15,4 +15,7 @@ The group results data is included. To update the bracket results, go to the bra
 If when running the app, before it says "Done reading results", it prints "Creating new object for <player name>. Check to make sure the submitted name is correct." that means that in the final bracket a name was submitted that wasn't the same as the name used in groups. It should be pretty easy to figure out which name it is and what the difference is.
 
 ## Change Log:
-Version 1.0 - Works on command line for group stage and bracket.
+Version 1.0.0 - Works on command line for group stage and bracket.
+Version 1.0.1 - Updated to count each level as a win or loss.
+Version 1.1.0 - Added GUI.
+Version 1.1.1 - Fixed error where the GUI would show previous runner's times if entered runner did not exist.
