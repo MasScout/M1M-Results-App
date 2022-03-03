@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -18,7 +19,11 @@ public class ResultsAnalyzer {
     // {3, 0} // FW
     // }; // E, E-NCS, G, G-NCS
 
-    public static void readResultsCSV(String filePath) {
+    /**
+     * Reads the results from the csv and saves them as a list of player objects
+     * @param filePath
+     */
+    public static void readResultsCSV(String filePath) throws FileNotFoundException {
         try {
             File file = new File(filePath);
             FileReader fr = new FileReader(file);
@@ -26,20 +31,8 @@ public class ResultsAnalyzer {
             String line = "";
             String[] tempArr;
             while ((line = br.readLine()) != null) {
-                // if (line.contains("\"")) {
-                // boolean inQuotes = false;
-                // int characterLocation = 0;
-                // for (char letter : line.toCharArray()) {
-                // if (letter == '\"') {
-                // inQuotes = true;
-                // }
-                // if (inQuotes && letter == ',') {
-                // inQuotes = false;
-                // line.repl
-                // }
-                // characterLocation++;
-                // }
-                // }
+                // Swap commas in quotes with semicolons
+                // Have to do this for the NCS levels selection
                 StringBuilder builder = new StringBuilder(line);
                 boolean inQuotes = false;
                 for (int currentIndex = 0; currentIndex < builder.length(); currentIndex++) {
@@ -47,16 +40,12 @@ public class ResultsAnalyzer {
                     if (currentChar == '\"')
                         inQuotes = !inQuotes; // toggle state
                     if (currentChar == ',' && inQuotes) {
-                        builder.setCharAt(currentIndex, ';'); // or '♡', and replace later
+                        builder.setCharAt(currentIndex, ';');
                     }
                 }
-                // List<String> result = Arrays.asList(builder.toString().split(","));
+                // Build an arry of fields
                 tempArr = builder.toString().split(",");
-                // tempArr = line.split(",");
-                // for(String tempStr : tempArr) {
-                // System.out.print(tempStr + " ");
-                // }
-                if (!line.contains("Timestamp")) {
+                if (!line.contains("Timestamp")) { // Skip the label row
                     if (filePath.contains("GroupResults.csv")) {
                         analyzeGroupLines(tempArr);
                     } else if (filePath.contains("FinalResults.csv")) {
@@ -65,9 +54,11 @@ public class ResultsAnalyzer {
                 }
             }
             br.close();
+        } catch (FileNotFoundException e) {
+            throw new FileNotFoundException();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        } 
     }
 
     /**
@@ -90,9 +81,6 @@ public class ResultsAnalyzer {
      */
     public static void analyzeGroupLines(String[] line) {
         // Create level names, with NCS as necessary
-        System.out.println(line[0] + "," + line[1] + "," + line[2] + "," + line[3] + "," + line[4] + "," + line[5]
-                + "," + line[6] + "," + line[7] + "," + line[8] + "," + line[9] + "," + line[10] + "," + line[11]
-                + "," + line[12] + "," + line[13]);
         String level1Name = ((!line[5].contains("1")) ? line[2] : line[2] + " - NCS").toLowerCase();
         String level2Name = ((!line[5].contains("2")) ? line[3] : line[3] + " - NCS").toLowerCase();
         String level3Name = ((!line[5].contains("3")) ? line[4] : line[4] + " - NCS").toLowerCase();
