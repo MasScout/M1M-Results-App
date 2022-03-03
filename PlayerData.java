@@ -1,6 +1,7 @@
 import java.util.*;
 
 public class PlayerData {
+
     public String playerName;
 
     public int wins;
@@ -10,8 +11,8 @@ public class PlayerData {
 
     public PlayerData(String name) {
         this.playerName = name;
-        levelTimes = new HashMap<String, ArrayList<Integer>>();
-    } 
+        this.levelTimes = new HashMap<String, ArrayList<Integer>>();
+    }
 
     public String calcAverageTime(String levelName) {
         ArrayList<Integer> times = new ArrayList<Integer>();
@@ -20,7 +21,7 @@ public class PlayerData {
             return convertTime((int)times.stream().mapToInt(val -> val).average().orElse(0));
         }
         else {
-            return "0:00";
+            return "-:--";
         }
        
     }
@@ -32,7 +33,7 @@ public class PlayerData {
             return convertTime(Collections.min(times));
         }
         else {
-            return "0:00";
+            return "-:--";
         }
     }
 
@@ -72,6 +73,9 @@ public class PlayerData {
     }
 
     public String convertTime(int time) {
+        if (time == 0) {
+            return "-:--";
+        }
         String minutes = Integer.toString(time/60);
         String seconds = Integer.toString(time%60);
         if (time%60 < 10) {

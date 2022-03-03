@@ -2,6 +2,13 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public class M1MRunner extends Frame implements ActionListener {
     public static String levels[] = {"BT-7274", "Blood and Rust", "Into the Abyss 1", "Into the Abyss 3", "Effect and Cause 2", "Effect and Cause 3", "The Beacon 2", "The Beacon 3", "Trial by Fire", "The Ark", "The Fold Weapon"};
@@ -94,15 +101,25 @@ public class M1MRunner extends Frame implements ActionListener {
     }
     public static void main(String[] args) {
 
+        // Download the CSV from Google Sheets
+        try {
+            InputStream in = new URL("https://docs.google.com/spreadsheets/d/11j00ZUrU4htj7MJjPymSzN1Raz5LxP8O7sUy0EkT7A8/export?format=csv&1369435889").openStream();
+            Files.copy(in, Paths.get("M2MGroupResults.csv"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e. printStackTrace();
+            System.exit(1);
+        }
+
+        // Read results for Groups and Finals (if they exist)
         String directory = System.getProperty("user.dir");
-        ResultsAnalyzer.readResultsCSV(directory + "\\GroupResults.csv");
-        ResultsAnalyzer.readResultsCSV(directory + "\\FinalResults.csv");
+        ResultsAnalyzer.readResultsCSV(directory + "\\M2MGroupResults.csv");
+        ResultsAnalyzer.readResultsCSV(directory + "\\M2MFinalResults.csv");
 
         System.out.println("Done reading results.");
 
         ResultsAnalyzer.playerDatas.stream().forEach(runner -> {
-            //System.out.println(runner.playerName + "\t\t" + runner.wins + "-" + runner.losses);
-            runner.removeTimes();
+            runner.printAll();
+            // runner.removeTimes();
         });
 
         new M1MRunner();        
