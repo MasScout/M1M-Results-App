@@ -1,8 +1,11 @@
 import java.util.*;
+import java.util.List;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -30,6 +33,7 @@ public class M1MRunner extends Frame implements ActionListener {
     JScrollPane runner2InfoPane = new JScrollPane(runner2Info, JScrollPane.VERTICAL_SCROLLBAR_NEVER ,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
     M1MRunner() {
+        // TODO: Rework UI to look better and show all information
         runner1Label.setBounds(50, 50, 100, 30);
         runner2Label.setBounds(250, 50, 100, 30);
         runner1Name.setBounds(50, 75, 100, 30);
@@ -62,12 +66,32 @@ public class M1MRunner extends Frame implements ActionListener {
         Optional<PlayerData> selectedRunner1 = ResultsAnalyzer.playerDatas.stream().filter(player -> player.playerName.toLowerCase().equals(runner1Name.getText().toLowerCase())).findFirst();
         Optional<PlayerData> selectedRunner2 = ResultsAnalyzer.playerDatas.stream().filter(player -> player.playerName.toLowerCase().equals(runner2Name.getText().toLowerCase())).findFirst();
         
+        
+
+        // // Declare File variables
+        // try{
+        //     FileWriter runner1Name = new FileWriter("Runner1Name.txt");
+        //     FileWriter runner1Seed = new FileWriter("Runner1Seed.txt");
+        //     FileWriter runner1WL = new FileWriter("Runner1WL.txt");
+        //     FileWriter runner1BestTime = new FileWriter("Runner1Best.txt");
+        //     FileWriter runner1AvgTime = new FileWriter("Runner1Avg.txt");
+
+        //     FileWriter runner2Name = new FileWriter("Runner2Name.txt");
+        //     FileWriter runner2Seed = new FileWriter("Runner2Seed.txt");
+        //     FileWriter runner2WL = new FileWriter("Runner2WL.txt");
+        //     FileWriter runner2BestTime = new FileWriter("Runner2Best.txt");
+        //     FileWriter runner2AvgTime = new FileWriter("Runner2Avg.txt");
+
+        // } catch (IOException writerException) {
+        //     writerException.printStackTrace();
+        // }
+
         // TODO: Write this data to respective files
         if (selectedRunner1.isPresent()) {
             PlayerData runner1 = selectedRunner1.get();
             String levelName = levelNameField.getItemAt(levelNameField.getSelectedIndex()).toLowerCase();
             if (ncsLevels.contains(levelName)) {
-                boolean ncsBool = ncsCheckBox.isSelected();//inputScanner.nextLine();
+                boolean ncsBool = ncsCheckBox.isSelected();
                 if (ncsBool) {
                     levelName = levelName + " - ncs";
                 }
@@ -87,7 +111,7 @@ public class M1MRunner extends Frame implements ActionListener {
             PlayerData runner2 = selectedRunner2.get();
             String levelName = levelNameField.getItemAt(levelNameField.getSelectedIndex()).toLowerCase();
             if (ncsLevels.contains(levelName)) {
-                boolean ncsBool = ncsCheckBox.isSelected();//inputScanner.nextLine();
+                boolean ncsBool = ncsCheckBox.isSelected();
                 if (ncsBool) {
                     levelName = levelName + " - ncs";
                 }
@@ -105,17 +129,18 @@ public class M1MRunner extends Frame implements ActionListener {
     }
     public static void main(String[] args) {
 
-        // Commented out for data accuracy testing
-        // // Download the CSV from Google Sheets
-        // try {
-        //     // Download Groups CSV
-        //     InputStream in = new URL("https://docs.google.com/spreadsheets/d/11j00ZUrU4htj7MJjPymSzN1Raz5LxP8O7sUy0EkT7A8/export?format=csv&1369435889").openStream();
-        //     Files.copy(in, Paths.get("M2MGroupResults.csv"), StandardCopyOption.REPLACE_EXISTING);
-        //     // TODO: Import Bracket Spreadsheet
-        // } catch (IOException e) {
-        //     e. printStackTrace();
-        //     System.exit(1);
-        // }
+        // Download the CSVs from Google Sheets
+        try {
+            // Download Groups CSV
+            InputStream groupIn = new URL("https://docs.google.com/spreadsheets/d/11j00ZUrU4htj7MJjPymSzN1Raz5LxP8O7sUy0EkT7A8/export?format=csv&1369435889").openStream();
+            Files.copy(groupIn, Paths.get("M2MGroupResults.csv"), StandardCopyOption.REPLACE_EXISTING);
+            // Download Bracket CSV
+            InputStream bracketIn = new URL("https://docs.google.com/spreadsheets/d/1f_DzgDYrAcBjXjxUfI1nhrGtLrBUKASaNQoIZ4rY7I0/export?format=csv&546557493").openStream();
+            Files.copy(bracketIn, Paths.get("M2MBracketResults.csv"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e. printStackTrace();
+            System.exit(1);
+        }
 
         // Read results for Groups and Finals (if they exist)
         String directory = System.getProperty("user.dir");
@@ -134,9 +159,14 @@ public class M1MRunner extends Frame implements ActionListener {
         System.out.println("Done reading results.");
 
         // // Debugging info
+        // String[] exemptRunners = {"zweek" , "skyze", "forgiven", "treebam3", "maltemller", "clawzx", "kneepad", "forte", "doakey", "thanos", "f2mccool", "missdirection"};
         // ResultsAnalyzer.playerDatas.stream().forEach(runner -> {
-        //     runner.printAll();
+        //     // runner.printAll();
         //     // runner.removeTimes();
+        //     if (!Arrays.asList(exemptRunners).contains(runner.playerName) && runner.wins + runner.losses < 9) {
+        //         int gamesPlayed = runner.wins + runner.losses;
+        //         System.out.println(runner.playerName + " has only played " + gamesPlayed/3);
+        //     }
         // });
 
         new M1MRunner();

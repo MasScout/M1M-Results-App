@@ -24,3 +24,6 @@ hs_err_pid*
 
 # Results files
 *.csv
+
+# VS Code
+*.code-workspace

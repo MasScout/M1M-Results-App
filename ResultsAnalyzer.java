@@ -48,7 +48,7 @@ public class ResultsAnalyzer {
                 if (!line.contains("Timestamp")) { // Skip the label row
                     if (filePath.contains("GroupResults.csv")) {
                         analyzeGroupLines(tempArr);
-                    } else if (filePath.contains("FinalResults.csv")) {
+                    } else if (filePath.contains("BracketResults.csv")) {
                         analyzeFinalLines(tempArr);
                     }
                 }
@@ -147,23 +147,51 @@ public class ResultsAnalyzer {
         playerDatas.add(player2Obj);
     }
 
+    /**
+     * Expands player database with bracket data
+     * 0: Timestamp
+     * 1: Level 1
+     * 2: Level 2
+     * 3: Level 3
+     * 4: Level 4
+     * 5: Level 5
+     * 6: NCS Levels
+     * 7: Winner Name
+     * 8: Winner Level 1 Time
+     * 9: Winner Level 2 Time
+     * 10: Winner Level 3 Time
+     * 11: Winner Level 4 Time
+     * 12: Winner Level 5 Time
+     * 13: Loser Name
+     * 14: Loser Level 1 Time
+     * 15: Loser Level 2 Time
+     * 16: Loser Level 3 Time
+     * 17: Loser Level 4 Time
+     * 18: Loser Level 5 Time
+     * @param line
+     */
     public static void analyzeFinalLines(String[] line) {
         // Create level names, with NCS as necessary
-        String level1Name = ((!line[4].contains("1")) ? line[1] : line[1] + " - NCS").toLowerCase();
-        String level2Name = ((!line[4].contains("2")) ? line[2] : line[2] + " - NCS").toLowerCase();
-        String level3Name = ((!line[4].contains("3")) ? line[3] : line[3] + " - NCS").toLowerCase();
-        String level4Name = ((!line[4].contains("4")) ? line[3] : line[3] + " - NCS").toLowerCase();
-        String level5Name = ((!line[4].contains("5")) ? line[3] : line[3] + " - NCS").toLowerCase();
+        String level1Name = ((!line[6].contains("1")) ? line[1] : line[1] + " - NCS").toLowerCase();
+        String level2Name = ((!line[6].contains("2")) ? line[2] : line[2] + " - NCS").toLowerCase();
+        String level3Name = ((!line[6].contains("3")) ? line[3] : line[3] + " - NCS").toLowerCase();
+        String level4Name = ((!line[6].contains("4")) ? line[4] : line[4] + " - NCS").toLowerCase();
+        String level5Name = ((!line[6].contains("5")) ? line[5] : line[5] + " - NCS").toLowerCase();
 
         // Create player names
         String player1 = line[7].toLowerCase();
         String player2 = line[13].toLowerCase();
 
+        System.out.println(player1 + ", " + player2);
         // Create and convert player times to seconds
         int[] player1Times = { timeToSeconds(line[8]), timeToSeconds(line[9]), timeToSeconds(line[10]),
                 timeToSeconds(line[11]), timeToSeconds(line[12]) };
+        
+        // Check that there are actually values for levels 4 and 5 for the loser
+        String level4Time = (line.length > 17) ? line[17] : "";
+        String level5Time = (line.length > 18) ? line[18] : "";
         int[] player2Times = { timeToSeconds(line[14]), timeToSeconds(line[15]), timeToSeconds(line[16]),
-                timeToSeconds(line[17]), timeToSeconds(line[18]) };
+                timeToSeconds(level4Time), timeToSeconds(level5Time) };
 
         // Check if player object already exists
         Optional<PlayerData> player1Data = playerDatas.stream().filter(player -> player.playerName.equals(player1))
@@ -230,6 +258,9 @@ public class ResultsAnalyzer {
     }
 
     public static int timeToSeconds(String time) {
+        if (time.isEmpty()) {
+            return 0;
+        }
         String timeArray[] = time.split(":");
         int timeSeconds = 3600 * (Integer.parseInt(timeArray[0])) + 60 * (Integer.parseInt(timeArray[1]))
                 + Integer.parseInt(timeArray[2]);
