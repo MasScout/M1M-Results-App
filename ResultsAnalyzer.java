@@ -20,6 +20,32 @@ public class ResultsAnalyzer {
     // }; // E, E-NCS, G, G-NCS
 
     /**
+     * Reads the grouping from the CSV and creates player objects
+     * @param filePath
+     * @throws FileNotFoundException
+     */
+    public static void readGroupingCSV(String filePath) throws FileNotFoundException {
+        try {
+            File file = new File(filePath);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line = "";
+            String[] tempArr;
+            while ((line = br.readLine()) != null) {
+                if (!(line.contains("Group") && line.contains("Player"))) {
+                    tempArr = line.split(",");
+                    playerDatas.add(new PlayerData(tempArr[1].toLowerCase(), tempArr[0].toLowerCase().charAt(0)));
+                }
+            }
+            br.close();
+        } catch (FileNotFoundException e) {
+            throw new FileNotFoundException();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Reads the results from the csv and saves them as a list of player objects
      * @param filePath
      */
@@ -101,15 +127,17 @@ public class ResultsAnalyzer {
         PlayerData player2Obj;
         // Construct new player object if it doesn't exist
         if (!player1Data.isPresent()) {
-            player1Obj = new PlayerData(player1);
-            // System.out.println("Creating new object for: " + player1Obj.playerName);
+            player1Obj = new PlayerData(player1, line[1].charAt(0));
+            System.out.println("Creating new object for: " + player1Obj.playerName
+                    + ". Check to make sure the submitted name is correct.");
         } else {
             player1Obj = player1Data.get();
             playerDatas.remove(player1Data.get());
         }
         if (!player2Data.isPresent()) {
-            player2Obj = new PlayerData(player2);
-            // System.out.println("Creating new object for: " + player2Obj.playerName);
+            player2Obj = new PlayerData(player2, line[1].charAt(0));
+            System.out.println("Creating new object for: " + player2Obj.playerName
+                    + ". Check to make sure the submitted name is correct.");
         } else {
             player2Obj = player2Data.get();
             playerDatas.remove(player2Data.get());
@@ -203,7 +231,7 @@ public class ResultsAnalyzer {
         PlayerData player2Obj;
         // Construct new player object if it doesn't exist
         if (!player1Data.isPresent()) {
-            player1Obj = new PlayerData(player1);
+            player1Obj = new PlayerData(player1, line[1].charAt(0));
             System.out.println("Creating new object for: " + player1Obj.playerName
                     + ". Check to make sure the submitted name is correct.");
         } else {
@@ -211,7 +239,7 @@ public class ResultsAnalyzer {
             playerDatas.remove(player1Data.get());
         }
         if (!player2Data.isPresent()) {
-            player2Obj = new PlayerData(player2);
+            player2Obj = new PlayerData(player2, line[1].charAt(0));
             System.out.println("Creating new object for: " + player2Obj.playerName
                     + ". Check to make sure the submitted name is correct.");
         } else {

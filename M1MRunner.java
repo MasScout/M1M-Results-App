@@ -129,45 +129,53 @@ public class M1MRunner extends Frame implements ActionListener {
     }
     public static void main(String[] args) {
 
+        String directory = System.getProperty("user.dir");
+
+        // Create player objects from seeding
+        try {
+            ResultsAnalyzer.readGroupingCSV(directory + "\\Data\\Final Seeding - M3M Groups.csv");
+        } catch (FileNotFoundException e) {
+            System.out.println("================================\nCOULD NOT FIND SEEDING INFO!!!\n================================");
+        }
+
         // Download the CSVs from Google Sheets
         try {
             // Download Groups CSV
-            InputStream groupIn = new URL("https://docs.google.com/spreadsheets/d/11j00ZUrU4htj7MJjPymSzN1Raz5LxP8O7sUy0EkT7A8/export?format=csv&1369435889").openStream();
-            Files.copy(groupIn, Paths.get("M2MGroupResults.csv"), StandardCopyOption.REPLACE_EXISTING);
+            // InputStream groupIn = new URL("https://docs.google.com/spreadsheets/d/11j00ZUrU4htj7MJjPymSzN1Raz5LxP8O7sUy0EkT7A8/export?format=csv&1369435889").openStream();
+            InputStream groupIn = new URL("https://docs.google.com/spreadsheets/d/1Kklgjip3lDxRC-Fu_SDVPO6RJxhIZOB-a4lj5m3M0tE/export?format=csv&2407586").openStream();
+            Files.copy(groupIn, Paths.get(directory + "\\Data\\M2MGroupResults.csv"), StandardCopyOption.REPLACE_EXISTING);
             // Download Bracket CSV
-            InputStream bracketIn = new URL("https://docs.google.com/spreadsheets/d/1f_DzgDYrAcBjXjxUfI1nhrGtLrBUKASaNQoIZ4rY7I0/export?format=csv&546557493").openStream();
-            Files.copy(bracketIn, Paths.get("M2MBracketResults.csv"), StandardCopyOption.REPLACE_EXISTING);
+            // InputStream bracketIn = new URL("https://docs.google.com/spreadsheets/d/1Kklgjip3lDxRC-Fu_SDVPO6RJxhIZOB-a4lj5m3M0tE/export?format=csv&2407586").openStream();
+            // Files.copy(bracketIn, Paths.get(directory + "\\Data\\M2MBracketResults.csv"), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e. printStackTrace();
             System.exit(1);
         }
-
-        // Read results for Groups and Finals (if they exist)
-        String directory = System.getProperty("user.dir");
         
+        // Read results for Groups and Finals (if they exist)
         try {
-            ResultsAnalyzer.readResultsCSV(directory + "\\M2MGroupResults.csv");
+            ResultsAnalyzer.readResultsCSV(directory + "\\Data\\M2MGroupResults.csv");
         } catch (FileNotFoundException e) {
             System.out.println("================================\nCOULD NOT FIND GROUPS RESULTS!!!\n================================");
         }
-        try {
-            ResultsAnalyzer.readResultsCSV(directory + "\\M2MBracketResults.csv");
-        } catch (FileNotFoundException e) {
-            System.out.println("=================================\nCOULD NOT FIND BRACKET RESULTS!!!\n=================================");
-        }
+        // try {
+        //     ResultsAnalyzer.readResultsCSV(directory + "\\M2MBracketResults.csv");
+        // } catch (FileNotFoundException e) {
+        //     System.out.println("=================================\nCOULD NOT FIND BRACKET RESULTS!!!\n=================================");
+        // }
 
         System.out.println("Done reading results.");
 
-        // // Debugging info
-        // String[] exemptRunners = {"zweek" , "skyze", "forgiven", "treebam3", "maltemller", "clawzx", "kneepad", "forte", "doakey", "thanos", "f2mccool", "missdirection"};
-        // ResultsAnalyzer.playerDatas.stream().forEach(runner -> {
-        //     // runner.printAll();
-        //     // runner.removeTimes();
-        //     if (!Arrays.asList(exemptRunners).contains(runner.playerName) && runner.wins + runner.losses < 9) {
-        //         int gamesPlayed = runner.wins + runner.losses;
-        //         System.out.println(runner.playerName + " has only played " + gamesPlayed/3);
-        //     }
-        // });
+        // Debugging info
+        String[] exemptRunners = {};
+        ResultsAnalyzer.playerDatas.stream().forEach(runner -> {
+            // runner.printAll();
+            // runner.removeTimes();
+            if (!Arrays.asList(exemptRunners).contains(runner.playerName) && runner.wins + runner.losses < 9) {
+                int gamesPlayed = runner.wins + runner.losses;
+                System.out.println(runner.playerName + " has only played " + gamesPlayed/3);
+            }
+        });
 
         new M1MRunner();
     }

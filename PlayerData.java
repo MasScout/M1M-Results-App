@@ -3,14 +3,16 @@ import java.util.*;
 public class PlayerData {
 
     public String playerName;
+    public char group;
 
     public int wins;
     public int losses;
 
     public Map<String, ArrayList<Integer>> levelTimes; // Level Name, [Time, Time, Time, Time...]
 
-    public PlayerData(String name) {
+    public PlayerData(String name, char group) {
         this.playerName = name;
+        this.group = group;
         this.levelTimes = new HashMap<String, ArrayList<Integer>>();
     }
 
