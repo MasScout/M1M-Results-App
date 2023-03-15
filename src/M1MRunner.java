@@ -1,11 +1,10 @@
-import java.util.*;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Optional;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -65,8 +64,6 @@ public class M1MRunner extends Frame implements ActionListener {
 
         Optional<PlayerData> selectedRunner1 = ResultsAnalyzer.playerDatas.stream().filter(player -> player.playerName.toLowerCase().equals(runner1Name.getText().toLowerCase())).findFirst();
         Optional<PlayerData> selectedRunner2 = ResultsAnalyzer.playerDatas.stream().filter(player -> player.playerName.toLowerCase().equals(runner2Name.getText().toLowerCase())).findFirst();
-        
-        
 
         // // Declare File variables
         // try{
@@ -159,7 +156,7 @@ public class M1MRunner extends Frame implements ActionListener {
             System.out.println("================================\nCOULD NOT FIND GROUPS RESULTS!!!\n================================");
         }
         // try {
-        //     ResultsAnalyzer.readResultsCSV(directory + "\\M2MBracketResults.csv");
+        //     ResultsAnalyzer.readResultsCSV(directory + "\\Data\\M2MBracketResults.csv");
         // } catch (FileNotFoundException e) {
         //     System.out.println("=================================\nCOULD NOT FIND BRACKET RESULTS!!!\n=================================");
         // }
