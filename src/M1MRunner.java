@@ -1,10 +1,16 @@
+package src;
 import java.util.Arrays;
 import java.util.Optional;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -15,6 +21,14 @@ import java.nio.file.StandardCopyOption;
 public class M1MRunner extends Frame implements ActionListener {
     public static String levels[] = {"BT-7274", "Blood and Rust", "Into the Abyss 1", "Into the Abyss 3", "Effect and Cause 2", "Effect and Cause 3", "The Beacon 2", "The Beacon 3", "Trial by Fire", "The Ark", "The Fold Weapon"};
     public static java.util.List<String> ncsLevels = Arrays.asList("bt-7274", "the beacon 3", "trial by fire", "the ark", "the fold weapon");
+    public static String groupingCSVLocation;
+    public static String groupsResultsCSVLocation;
+    public static String bracketResultsCSVLocation;
+    public static String groupsResultsURL;
+    public static String bracketResultsURL;
+    public static boolean runBracketBool;
+    public static boolean outputRemainingGroupMatchesBool;
+    public static String remainingGroupsFile;
     // TODO: Add seed map
     
     JFrame MasBot = new JFrame("MasBot");
@@ -124,13 +138,56 @@ public class M1MRunner extends Frame implements ActionListener {
             runner2Info.setText(runner2Data);
         }
     }
+
+    public static boolean readConfiguration(String filePath) {
+        try {
+            File file = new File(filePath);
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                if (!line.startsWith("#")) {
+                    if (line.contains("GroupingCSVLocation")) {
+                        groupingCSVLocation = line.split("=")[1];
+                    } else if (line.contains("GroupsResultsCSVLocation")) {
+                        groupsResultsCSVLocation = line.split("=")[1];
+                    } else if (line.contains("BracketResultsCSVLocation")) {
+                        bracketResultsCSVLocation = line.split("=")[1];
+                    } else if (line.contains("GroupsResultsURL")) {
+                        groupsResultsURL = line.split("~")[1];
+                    } else if (line.contains("BracketResultsURL")) {
+                        bracketResultsURL = line.split("~")[1];
+                    } else if (line.contains("RunBracketBool")) {
+                        runBracketBool = (line.split("=")[1].equals("true")) ? true : false;
+                    } else if (line.contains("OutputRemainingGroupMatchesBool")) {
+                        outputRemainingGroupMatchesBool = (line.split("=")[1].equals("true")) ? true : false;
+                    } else if (line.contains("RemainingGroupsFile")) {
+                        remainingGroupsFile = (line.split("="))[1];
+                    }
+                }
+            }
+            br.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("================================\nCOULD NOT FIND CONFIG!!!\n================================");
+            return false;
+        } catch (IOException e) {
+            System.out.println("================================\nERROR READING CONFIG!!!\n================================");
+            return false;
+        }
+        return true;
+    }
     public static void main(String[] args) {
 
         String directory = System.getProperty("user.dir");
+        System.out.println(directory + "\\config.cfg");
+        if (!readConfiguration(directory + "\\config.cfg")) {
+            System.out.println("Exiting Program");
+            return;
+        }
 
         // Create player objects from seeding
         try {
-            ResultsAnalyzer.readGroupingCSV(directory + "\\Data\\Final Seeding - M3M Groups.csv");
+            ResultsAnalyzer.readGroupingCSV(directory + groupingCSVLocation);
         } catch (FileNotFoundException e) {
             System.out.println("================================\nCOULD NOT FIND SEEDING INFO!!!\n================================");
         }
@@ -138,12 +195,13 @@ public class M1MRunner extends Frame implements ActionListener {
         // Download the CSVs from Google Sheets
         try {
             // Download Groups CSV
-            // InputStream groupIn = new URL("https://docs.google.com/spreadsheets/d/11j00ZUrU4htj7MJjPymSzN1Raz5LxP8O7sUy0EkT7A8/export?format=csv&1369435889").openStream();
-            InputStream groupIn = new URL("https://docs.google.com/spreadsheets/d/1Kklgjip3lDxRC-Fu_SDVPO6RJxhIZOB-a4lj5m3M0tE/export?format=csv&2407586").openStream();
-            Files.copy(groupIn, Paths.get(directory + "\\Data\\M2MGroupResults.csv"), StandardCopyOption.REPLACE_EXISTING);
+            InputStream groupIn = new URL(groupsResultsURL).openStream();
+            Files.copy(groupIn, Paths.get(directory + groupsResultsCSVLocation), StandardCopyOption.REPLACE_EXISTING);
             // Download Bracket CSV
-            // InputStream bracketIn = new URL("https://docs.google.com/spreadsheets/d/1Kklgjip3lDxRC-Fu_SDVPO6RJxhIZOB-a4lj5m3M0tE/export?format=csv&2407586").openStream();
-            // Files.copy(bracketIn, Paths.get(directory + "\\Data\\M2MBracketResults.csv"), StandardCopyOption.REPLACE_EXISTING);
+            if (runBracketBool) {
+                InputStream bracketIn = new URL(bracketResultsURL).openStream();
+                Files.copy(bracketIn, Paths.get(directory + bracketResultsCSVLocation), StandardCopyOption.REPLACE_EXISTING);    
+            }
         } catch (IOException e) {
             e. printStackTrace();
             System.exit(1);
@@ -151,28 +209,42 @@ public class M1MRunner extends Frame implements ActionListener {
         
         // Read results for Groups and Finals (if they exist)
         try {
-            ResultsAnalyzer.readResultsCSV(directory + "\\Data\\M2MGroupResults.csv");
+            ResultsAnalyzer.readResultsCSV(directory + groupsResultsCSVLocation);
         } catch (FileNotFoundException e) {
             System.out.println("================================\nCOULD NOT FIND GROUPS RESULTS!!!\n================================");
         }
-        // try {
-        //     ResultsAnalyzer.readResultsCSV(directory + "\\Data\\M2MBracketResults.csv");
-        // } catch (FileNotFoundException e) {
-        //     System.out.println("=================================\nCOULD NOT FIND BRACKET RESULTS!!!\n=================================");
-        // }
+        if (runBracketBool) {
+            try {
+                ResultsAnalyzer.readResultsCSV(directory + bracketResultsCSVLocation);
+            } catch (FileNotFoundException e) {
+                System.out.println("=================================\nCOULD NOT FIND BRACKET RESULTS!!!\n=================================");
+            }
+        }
 
         System.out.println("Done reading results.");
 
         // Debugging info
-        String[] exemptRunners = {};
-        ResultsAnalyzer.playerDatas.stream().forEach(runner -> {
-            // runner.printAll();
-            // runner.removeTimes();
-            if (!Arrays.asList(exemptRunners).contains(runner.playerName) && runner.wins + runner.losses < 9) {
-                int gamesPlayed = runner.wins + runner.losses;
-                System.out.println(runner.playerName + " has only played " + gamesPlayed/3);
+        // System.out.println(outputRemainingGroupMatchesBool);
+        if (outputRemainingGroupMatchesBool) {
+            String[] exemptRunners = {"skeleton_jelly", "lemuura", "randombanana9", "fuchsiano"};
+            String remainingRunners = "Runner,Group,Sets Played\n";
+            for (PlayerData runner : ResultsAnalyzer.playerDatas) {
+                if (!Arrays.asList(exemptRunners).contains(runner.playerName) && runner.wins + runner.losses < 9) {                   
+                    int gamesPlayed = runner.wins + runner.losses;
+                    String runnerInfo = runner.playerName + "," + runner.group + "," + gamesPlayed / 3 + "\n";
+                    remainingRunners += runnerInfo;
+                    // System.out.println(remainingRunners);
+                }
             }
-        });
+
+            try {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(directory + remainingGroupsFile));
+                writer.write(remainingRunners);
+                writer.close();
+            } catch (IOException e) {
+                System.out.println("=================================\nCOULD NOT WRITE TO REMAINING GROUPS FILE!!!\n=================================");
+            }
+        }
 
         new M1MRunner();
     }
