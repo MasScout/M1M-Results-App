@@ -1,4 +1,5 @@
 package src;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -29,6 +30,7 @@ public class M1MRunner extends Frame implements ActionListener {
     public static boolean runBracketBool;
     public static boolean outputRemainingGroupMatchesBool;
     public static String remainingGroupsFile;
+    public static ArrayList<String> exemptRunners = new ArrayList<>();
     // TODO: Add seed map
     
     JFrame MasBot = new JFrame("MasBot");
@@ -163,6 +165,10 @@ public class M1MRunner extends Frame implements ActionListener {
                         outputRemainingGroupMatchesBool = (line.split("=")[1].equals("true")) ? true : false;
                     } else if (line.contains("RemainingGroupsFile")) {
                         remainingGroupsFile = (line.split("="))[1];
+                    } else if (line.contains("ExemptRunners")) {
+                        for (String runnerName : Arrays.asList(line.split("=")[1].split(","))) {
+                            exemptRunners.add(runnerName);
+                        }
                     }
                 }
             }
@@ -179,7 +185,6 @@ public class M1MRunner extends Frame implements ActionListener {
     public static void main(String[] args) {
 
         String directory = System.getProperty("user.dir");
-        System.out.println(directory + "\\config.cfg");
         if (!readConfiguration(directory + "\\config.cfg")) {
             System.out.println("Exiting Program");
             return;
@@ -226,10 +231,11 @@ public class M1MRunner extends Frame implements ActionListener {
         // Debugging info
         // System.out.println(outputRemainingGroupMatchesBool);
         if (outputRemainingGroupMatchesBool) {
-            String[] exemptRunners = {"skeleton_jelly", "lemuura", "randombanana9", "fuchsiano"};
+            // String[] exemptRunners = {"skeleton_jelly", "lemuura", "randombanana9", "fuchsiano"};
             String remainingRunners = "Runner,Group,Sets Played\n";
             for (PlayerData runner : ResultsAnalyzer.playerDatas) {
-                if (!Arrays.asList(exemptRunners).contains(runner.playerName) && runner.wins + runner.losses < 9) {                   
+                // if (!Arrays.asList(exemptRunners).contains(runner.playerName) && runner.wins + runner.losses < 9) {
+                if (!exemptRunners.contains(runner.playerName) && runner.wins + runner.losses < 9) {                   
                     int gamesPlayed = runner.wins + runner.losses;
                     String runnerInfo = runner.playerName + "," + runner.group + "," + gamesPlayed / 3 + "\n";
                     remainingRunners += runnerInfo;
